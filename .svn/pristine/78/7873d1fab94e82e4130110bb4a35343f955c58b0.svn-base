@@ -1,0 +1,136 @@
+package com.hewe.user.controller;
+
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hewe.sys.constant.ResultCode;
+import com.hewe.sys.controller.BasicController;
+import com.hewe.sys.utils.Content;
+import com.hewe.sys.utils.WebTools;
+import com.hewe.user.dao.UserDao;
+
+/**
+ * @author hewe
+ *
+ */
+@RestController
+@RequestMapping("/user")
+public class UserController extends BasicController {
+
+	private UserDao userDao;
+
+	/**
+	 * 通过邮箱获取验证码
+	 * 
+	 * @param email
+	 * @return
+	 */
+	@GetMapping("/verificationCode/email")
+	public ResponseEntity<?> getVerificationCodeByEmail(@RequestParam(name = "email", required = true) String email) {
+
+		// 是否是邮箱
+		if (!WebTools.isEmail(email)) {
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+		if (userDao.userExistByEmailOrPhone(email)) {
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_EXISTS));
+		}
+		int code = userDao.getVerificationCode(email);
+		return ResponseEntity.ok(Content.ok(code));
+	}
+
+	/**
+	 * 检验验证码是否正确
+	 * 
+	 * @param map
+	 *            包含identity和验证码
+	 * @return
+	 */
+	@PostMapping("/verificationCode/check")
+	public ResponseEntity<?> checkVerificationCode(@RequestBody Map<String, String> map) {
+		String identity = map.get("identity");
+		String code = map.get("code");
+		if (!WebTools.isEmail(identity) && !WebTools.isPhone(identity)) {
+			log.debug("参数格式不支持" + identity);
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+		int iCode = 0;
+		try {
+			iCode = Integer.valueOf(code);
+		} catch (NumberFormatException e) {
+			log.debug("code错误" + code);
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+
+		if (!userDao.checkCode(identity, iCode)) {
+			log.debug("验证失败");
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_CODE));
+		}
+		return ResponseEntity.ok(Content.ok(null));
+	}
+
+	@PutMapping("/register")
+	public ResponseEntity<?> regesterUser(@RequestBody Map<String, String> map) {
+		String identity = map.get("identity");
+		String password = map.get("password");
+		String code = map.get("code");
+		if (!WebTools.isEmail(identity) && !WebTools.isPhone(identity)) {
+			log.debug("参数格式不支持" + identity);
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+		int iCode = 0;
+		try {
+			iCode = Integer.valueOf(code);
+		} catch (NumberFormatException e) {
+			log.debug("code错误" + code);
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+
+		if (!WebTools.isPasswrod(password)) {
+			log.debug("参数格式不支持" + identity);
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_ILLEGAL));
+		}
+
+		// 验证验证码
+		if (!userDao.checkCode(identity, iCode)) {
+			log.debug("验证失败");
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_CODE));
+		}
+		// 是否存在
+		if (!userDao.userExistByEmailOrPhone(identity)) {
+			return ResponseEntity.ok(Content.status(ResultCode.ERROR_EXISTS));
+		}
+		// 保存
+		String id = userDao.register(identity, password);
+		log.debug("注册成功:" + id);
+		return ResponseEntity.ok(Content.ok(id));
+	}
+
+	@PostMapping("/getUserToken")
+	public ResponseEntity<?> login(@RequestBody Map<String, String> map){
+		String identity = map.get("identity");
+		String password = map.get("password");
+		log.debug("identity:" + identity +"," + "password:" + password);
+		
+		
+		return ResponseEntity.ok(Content.ok("dsafasd"));
+	}
+	
+	public UserDao getUserDao() {
+		return userDao;
+	}
+
+	@Autowired
+	public void setUserDao(UserDao userDao) {
+		this.userDao = userDao;
+	}
+}

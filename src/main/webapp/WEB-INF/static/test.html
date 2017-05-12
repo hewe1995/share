@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>test</title>
+<script src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#vcode").click(function() {
+			$.ajax({
+
+				url : '/share/user/verificationCode/email',
+				async : false,
+				data : {
+					email : 'asf',
+				},
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+		$("#checkCode").click(function() {
+			var data = {
+				'identity' : '18233293969',
+				'code' : '2323'
+			};
+			$.ajax({
+
+				url : '/share/user/verificationCode/check',
+				async : false,
+				contentType : 'application/json',
+				method : 'post',
+				data : JSON.stringify(data),
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+		//注册用户
+		$("#register").click(function() {
+			var data = {
+				'identity' : '18233293969',
+				'code' : '2323',
+				'password' : 'dsahfdsahg'
+			};
+			$.ajax({
+
+				url : '/share/user/register',
+				async : false,
+				contentType : 'application/json',
+				method : 'put',
+				data : JSON.stringify(data),
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+		//登录用户
+		$("#login").click(function() {
+			var data = {
+				'identity' : '18233293969',
+				'password' : 'dsahfdsahg'
+			};
+			$.ajax({
+
+				url : '/share/user/getUserToken',
+				async : false,
+				contentType : 'application/json',
+				method : 'post',
+				data : JSON.stringify(data),
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+		//添加地点
+		$("#addLocation").click(function() {
+			var data = {
+				'name' : '保定学院',
+				'type' : 'school',
+				'longitude': '112.325246246',
+			};
+			$.ajax({
+
+				url : '/share/location/add',
+				async : false,
+				contentType : 'application/json',
+				method : 'post',
+				data : JSON.stringify(data),
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+		//获取某个地点的footmarks
+		$("#footmarks").click(function() {
+			$.ajax({
+
+				url : '/share/location/footmarks/235235;size=12;start=23',
+				async : false,
+				contentType : 'application/json',
+				method : 'get',
+				success : function(data, textStatus, jqXHR) {
+					console.log(data)
+					console.log(textStatus)
+					console.log(jqXHR)
+				},
+				error : function(xhr, textStatus) {
+					console.log('错误')
+					console.log(xhr)
+					console.log(textStatus)
+				},
+				complete : function() {
+					console.log('结束')
+				}
+			});
+		});
+	});
+</script>
+</head>
+<body>
+	<h1>hello</h1>
+	<ul>
+		<li id="vcode"><a href="#">获取验证码</a></li>
+		<li id="checkCode"><a href="#">验证验证码</a></li>
+		<li id="register"><a href="#">注册</a></li>
+		<li id="login"><a href="#">登录</a></li>
+		<li id="addLocation"><a href="#">添加地点</a></li>
+		<li id="footmarks"><a href="#">获取某个地点的footmarks</a></li>
+	</ul>
+</body>
+</html>
